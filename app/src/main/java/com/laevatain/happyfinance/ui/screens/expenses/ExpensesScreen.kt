@@ -75,7 +75,12 @@ fun ExpensesScreen(modifier: Modifier = Modifier) {
             .padding(20.dp)
             .verticalScroll(rememberScrollState())
     ) {
-        Text("Gastos y presupuestos", color = colors.textPrimary, fontSize = 18.sp, fontWeight = FontWeight.SemiBold)
+        Text(
+            "Gastos y presupuestos",
+            color = colors.textPrimary,
+            fontSize = 18.sp,
+            fontWeight = FontWeight.SemiBold
+        )
 
         Spacer(modifier = Modifier.height(20.dp))
 
@@ -100,7 +105,12 @@ fun ExpensesScreen(modifier: Modifier = Modifier) {
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        Text("Presupuestos", color = colors.textPrimary, fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
+        Text(
+            "Presupuestos",
+            color = colors.textPrimary,
+            fontSize = 13.sp,
+            fontWeight = FontWeight.SemiBold
+        )
 
         Spacer(modifier = Modifier.height(12.dp))
 
