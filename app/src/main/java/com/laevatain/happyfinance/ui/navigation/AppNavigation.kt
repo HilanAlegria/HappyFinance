@@ -19,7 +19,10 @@ sealed class Screen(val route: String) {
 }
 
 @Composable
-fun AppNavigation() {
+fun AppNavigation(
+    isDarkTheme: Boolean,
+    onToggleTheme: () -> Unit
+) {
     val navController = rememberNavController()
     var isAuthenticated by remember { mutableStateOf(false) }
     val startDestination = if (isAuthenticated) Screen.Main.route else Screen.Login.route
@@ -58,6 +61,8 @@ fun AppNavigation() {
 
         composable(Screen.Main.route) {
             MainScreen(
+                isDarkTheme = isDarkTheme,
+                onToggleTheme = onToggleTheme,
                 onLogout = {
                     isAuthenticated = false
                     navController.navigate(Screen.Login.route) {

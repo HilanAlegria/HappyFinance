@@ -42,7 +42,11 @@ data class TabItem(
 )
 
 @Composable
-fun MainScreen(onLogout: () -> Unit) {
+fun MainScreen(
+    isDarkTheme: Boolean,
+    onToggleTheme: () -> Unit,
+    onLogout: () -> Unit
+) {
     val colors = AppTheme.colors
 
     val tabs = listOf(
@@ -89,7 +93,12 @@ fun MainScreen(onLogout: () -> Unit) {
             1 -> ExpensesScreen(modifier = Modifier.padding(innerPadding))
             2 -> PortfolioScreen(modifier = Modifier.padding(innerPadding))
             3 -> ReportsScreen(modifier = Modifier.padding(innerPadding))
-            4 -> ProfileScreen(modifier = Modifier.padding(innerPadding), onLogout = onLogout)
+            4 -> ProfileScreen(
+                modifier = Modifier.padding(innerPadding),
+                isDarkTheme = isDarkTheme,
+                onToggleTheme = onToggleTheme,
+                onLogout = onLogout
+            )
         }
     }
 }

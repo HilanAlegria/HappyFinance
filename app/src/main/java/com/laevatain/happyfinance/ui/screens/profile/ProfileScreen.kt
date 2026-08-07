@@ -27,10 +27,6 @@ import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -44,9 +40,13 @@ import com.laevatain.happyfinance.ui.theme.Brand
 import com.laevatain.happyfinance.ui.theme.Danger
 
 @Composable
-fun ProfileScreen(modifier: Modifier = Modifier, onLogout: () -> Unit) {
+fun ProfileScreen(
+    modifier: Modifier = Modifier,
+    isDarkTheme: Boolean,
+    onToggleTheme: () -> Unit,
+    onLogout: () -> Unit
+) {
     val colors = AppTheme.colors
-    var isDarkMode by remember { mutableStateOf(true) }
 
     Column(
         modifier = modifier
@@ -55,12 +55,7 @@ fun ProfileScreen(modifier: Modifier = Modifier, onLogout: () -> Unit) {
             .padding(20.dp)
             .verticalScroll(rememberScrollState())
     ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text("Perfil", color = colors.textPrimary, fontSize = 18.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.weight(1f))
-        }
+        Text("Perfil", color = colors.textPrimary, fontSize = 18.sp, fontWeight = FontWeight.SemiBold)
 
         Spacer(modifier = Modifier.height(20.dp))
 
@@ -109,14 +104,14 @@ fun ProfileScreen(modifier: Modifier = Modifier, onLogout: () -> Unit) {
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(
-                        if (isDarkMode) Icons.Default.DarkMode else Icons.Default.LightMode,
+                        if (isDarkTheme) Icons.Default.DarkMode else Icons.Default.LightMode,
                         contentDescription = null,
                         tint = Brand,
                         modifier = Modifier.size(16.dp)
                     )
                 }
                 Text(
-                    if (isDarkMode) "Modo oscuro" else "Modo claro",
+                    if (isDarkTheme) "Modo oscuro" else "Modo claro",
                     color = colors.textPrimary,
                     fontSize = 13.sp,
                     modifier = Modifier
@@ -124,8 +119,8 @@ fun ProfileScreen(modifier: Modifier = Modifier, onLogout: () -> Unit) {
                         .padding(start = 12.dp)
                 )
                 Switch(
-                    checked = isDarkMode,
-                    onCheckedChange = { isDarkMode = it },
+                    checked = isDarkTheme,
+                    onCheckedChange = { onToggleTheme() },
                     colors = SwitchDefaults.colors(
                         checkedThumbColor = Color.White,
                         checkedTrackColor = Brand,
@@ -148,9 +143,9 @@ fun ProfileScreen(modifier: Modifier = Modifier, onLogout: () -> Unit) {
                 .background(colors.surface)
         ) {
             Column {
-                SettingRow(icon = Icons.Default.Notifications, label = "Notificaciones", tint = Brand, border = colors.border, onClick = {})
+                SettingRow(icon = Icons.Default.Notifications, label = "Notificaciones", tint = Brand, onClick = {})
                 Divider(color = colors.border, thickness = 0.5.dp)
-                SettingRow(icon = Icons.Default.Security, label = "Seguridad y privacidad", tint = Brand, border = colors.border, onClick = {})
+                SettingRow(icon = Icons.Default.Security, label = "Seguridad y privacidad", tint = Brand, onClick = {})
             }
         }
 
@@ -173,7 +168,6 @@ private fun SettingRow(
     icon: ImageVector,
     label: String,
     tint: Color,
-    border: Color,
     onClick: () -> Unit
 ) {
     val colors = AppTheme.colors

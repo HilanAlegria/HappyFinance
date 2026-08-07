@@ -9,17 +9,27 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.DirectionsCar
+import androidx.compose.material.icons.filled.FitnessCenter
+import androidx.compose.material.icons.filled.LocalHospital
+import androidx.compose.material.icons.filled.MenuBook
+import androidx.compose.material.icons.filled.Restaurant
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.laevatain.happyfinance.ui.screens.dashboard.TransactionRepository
 import com.laevatain.happyfinance.ui.theme.AppTheme
 import com.laevatain.happyfinance.ui.theme.Brand
 import com.laevatain.happyfinance.ui.theme.Danger
@@ -27,17 +37,16 @@ import com.laevatain.happyfinance.ui.theme.Warning
 
 data class BudgetCategoryUi(
     val name: String,
-    val icon: String,
-    val spent: Double,
+    val icon: ImageVector,
     val limit: Double
 )
 
-val defaultCategories = listOf(
-    BudgetCategoryUi("Alimentacion", "🍽", 0.0, 600000.0),
-    BudgetCategoryUi("Transporte", "🚗", 0.0, 200000.0),
-    BudgetCategoryUi("Entretenimiento", "🎮", 0.0, 200000.0),
-    BudgetCategoryUi("Salud", "💊", 0.0, 300000.0),
-    BudgetCategoryUi("Educacion", "📚", 0.0, 400000.0),
+val budgetCategories = listOf(
+    BudgetCategoryUi("Alimentacion", Icons.Default.Restaurant, 600000.0),
+    BudgetCategoryUi("Transporte", Icons.Default.DirectionsCar, 200000.0),
+    BudgetCategoryUi("Entretenimiento", Icons.Default.FitnessCenter, 200000.0),
+    BudgetCategoryUi("Salud", Icons.Default.LocalHospital, 300000.0),
+    BudgetCategoryUi("Educacion", Icons.Default.MenuBook, 400000.0),
 )
 
 fun getBudgetColor(spent: Double, limit: Double) = when {
@@ -49,6 +58,15 @@ fun getBudgetColor(spent: Double, limit: Double) = when {
 @Composable
 fun ExpensesScreen(modifier: Modifier = Modifier) {
     val colors = AppTheme.colors
+    val transactions = TransactionRepository.transactions
+    val totalExpense = TransactionRepository.totalExpense
+
+    @Composable
+    fun spentForCategory(categoryName: String): Double {
+        return transactions
+            .filter { !it.isIncome && it.category == categoryName }
+            .sumOf { it.amount }
+    }
 
     Column(
         modifier = modifier
@@ -71,7 +89,12 @@ fun ExpensesScreen(modifier: Modifier = Modifier) {
             Column {
                 Text("Total gastado", color = colors.textSecondary, fontSize = 11.sp)
                 Spacer(modifier = Modifier.height(4.dp))
-                Text("$ 0", color = colors.textPrimary, fontSize = 26.sp, fontWeight = FontWeight.Bold)
+                Text(
+                    "$ ${"%,.0f".format(totalExpense)}",
+                    color = colors.textPrimary,
+                    fontSize = 26.sp,
+                    fontWeight = FontWeight.Bold
+                )
             }
         }
 
@@ -81,9 +104,12 @@ fun ExpensesScreen(modifier: Modifier = Modifier) {
 
         Spacer(modifier = Modifier.height(12.dp))
 
-        defaultCategories.forEach { cat ->
-            val ratio = if (cat.limit > 0) cat.spent / cat.limit else 0.0
-            val barColor = getBudgetColor(cat.spent, cat.limit)
+        budgetCategories.forEach { cat ->
+            val spent = transactions
+                .filter { !it.isIncome && it.category == cat.name }
+                .sumOf { it.amount }
+            val ratio = if (cat.limit > 0) spent / cat.limit else 0.0
+            val barColor = getBudgetColor(spent, cat.limit)
 
             Box(
                 modifier = Modifier
@@ -98,7 +124,12 @@ fun ExpensesScreen(modifier: Modifier = Modifier) {
                         modifier = Modifier.fillMaxWidth(),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Text(cat.icon, fontSize = 16.sp)
+                        Icon(
+                            imageVector = cat.icon,
+                            contentDescription = cat.name,
+                            tint = Brand,
+                            modifier = Modifier.size(18.dp)
+                        )
                         Text(
                             cat.name,
                             color = colors.textPrimary,
@@ -109,7 +140,7 @@ fun ExpensesScreen(modifier: Modifier = Modifier) {
                                 .padding(start = 8.dp)
                         )
                         Text(
-                            "$ ${cat.spent.toLong()} / $ ${cat.limit.toLong()}",
+                            "$ ${"%,.0f".format(spent)} / $ ${"%,.0f".format(cat.limit)}",
                             color = colors.textSecondary,
                             fontSize = 11.sp
                         )
